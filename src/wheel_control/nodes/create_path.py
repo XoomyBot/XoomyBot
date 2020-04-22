@@ -24,13 +24,12 @@ if __name__=="__main__":
     rospy.init_node('create_path')
     pub = rospy.Publisher('path', path_message, queue_size=10)
 
-
     try:
         print(msg)
         while(1):
-            key = getKey()
+
             if key == 'r' :
-                drawRectangle(control_linear_vel, target_linear_vel,control_angular_vel, target_angular_vel)  
+                drawRectangle(1,2,90)  
 	    elif key == 's':
 		message = path_message()
        		message.function = "stop"
