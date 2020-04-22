@@ -1,39 +1,42 @@
+import rospy
+from geometry_msgs.msg import Twist
+import sys, select, os
+import math
+import time
+import path_message.msg
+e = """
+Communications Failed
+"""
+
+msg = """
+Control Your TurtleBot3!
+---------------------------
+press r to draw a rectangle
+
+space key, s : force stop
+
+CTRL-C to quit
+"""
 if __name__=="__main__":
     if os.name != 'nt':
         settings = termios.tcgetattr(sys.stdin)
 
     rospy.init_node('create_path')
-    pub = rospy.Publisher('cmd_vel', Twist, queue_size=10)
+    pub = rospy.Publisher('path', path_message, queue_size=10)
 
-    turtlebot3_model = rospy.get_param("model", "burger")
-
-    status = 0
-    target_linear_vel   = 0.0
-    target_angular_vel  = 0.0
-    control_linear_vel  = 0.0
-    control_angular_vel = 0.0
 
     try:
         print(msg)
         while(1):
             key = getKey()
-            if key == 'f': 
-                goStraight(1,control_linear_vel, target_linear_vel,control_angular_vel, target_angular_vel)
-                
-            elif key == 't' :
-                angle_degree = 90
-                turn(angle_degree,control_linear_vel, target_linear_vel,control_angular_vel, target_angular_vel)
-            elif key == 'r' :
+            if key == 'r' :
                 drawRectangle(control_linear_vel, target_linear_vel,control_angular_vel, target_angular_vel)  
-                
-#vaste angular snelheid <-> duurtijd => hoek
-            elif key == ' ' or key == 's' :#dit in een functie steken stoppen -> hoe meerdere argumentern terug geven?
-                target_linear_vel   = 0.0
-                control_linear_vel  = 0.0
-                target_angular_vel  = 0.0
-                control_angular_vel = 0.0
-                print(vels(target_linear_vel, target_angular_vel))
-                controleEnPublish(control_linear_vel, target_linear_vel,control_angular_vel, target_angular_vel)
+	    elif key == 's':
+		message = path_message()
+       		message.function = "stop"
+		message.distance= 0.0
+		message.angle = 0.0
+        	pub.publish(message)
             else:
                 if (key == '\x03'):
                     break
@@ -42,10 +45,33 @@ if __name__=="__main__":
         print(e)
 
     finally:
-        twist = Twist()
-        twist.linear.x = 0.0; twist.linear.y = 0.0; twist.linear.z = 0.0
-        twist.angular.x = 0.0; twist.angular.y = 0.0; twist.angular.z = 0.0
-        pub.publish(twist)
+        message = path_message()
+       	message.function = ""
+	message.distance = 0.0
+	message.angle = 0.0
+        pub.publish(message)
 
     if os.name != 'nt':
         termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
+
+def publish_message(func,dist,ang):
+	message = path_message()
+       	message.function = func
+	message.distance = dist
+	message.angle = ang
+        pub.publish(message)
+
+def drawRectangle(d1,d2,a): 
+    publish_message(stop,0,0)   
+    publish_message(straigth,d1,0)
+    publish_message(stop,0,0)
+    publish_message(turn,0,a)
+    publish_message(straigth,d2,0)
+    publish_message(stop,0,0)
+    publish_message(turn,0,a)
+    publish_message(straigth,d1,0)
+    publish_message(stop,0,0)
+    publish_message(turn,0,a)
+    publish_message(straigth,d2,0)
+    stop()
+    return

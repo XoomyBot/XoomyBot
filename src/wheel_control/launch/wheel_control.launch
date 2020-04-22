@@ -5,4 +5,6 @@
   <!-- turtlebot3_teleop_key already has its own built in velocity smoother -->
   <node pkg="wheel_control" type="wheel_control" name="wheel_control"  output="screen">
   </node>
+  <node pkg="wheel_control" type="create_path" name="create_path"  output="screen">
+  </node>
 </launch>

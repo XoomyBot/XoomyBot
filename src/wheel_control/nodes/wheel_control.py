@@ -29,6 +29,7 @@
 
 import rospy
 from geometry_msgs.msg import Twist
+import path_message.msg
 import sys, select, os
 import math
 import time
@@ -153,21 +154,7 @@ def stop():
     control_linear_vel, control_angular_vel = controleEnPublish(control_linear_vel, target_linear_vel,control_angular_vel, target_angular_vel)
     return
 
-def drawRectangle(control_linear_vel, target_linear_vel,control_angular_vel, target_angular_vel):
-    angle_degree = 90
-    stop()
-    goStraight(1,control_linear_vel, target_linear_vel,control_angular_vel, target_angular_vel)
-    stop()
-    turn(angle_degree,control_linear_vel, target_linear_vel,control_angular_vel, target_angular_vel)
-    goStraight(0.5,control_linear_vel, target_linear_vel,control_angular_vel, target_angular_vel)
-    stop()
-    turn(angle_degree,control_linear_vel, target_linear_vel,control_angular_vel, target_angular_vel)
-    goStraight(1,control_linear_vel, target_linear_vel,control_angular_vel, target_angular_vel)
-    stop()
-    turn(angle_degree,control_linear_vel, target_linear_vel,control_angular_vel, target_angular_vel)
-    goStraight(0.5,control_linear_vel, target_linear_vel,control_angular_vel, target_angular_vel)
-    stop()
-    return
+
 
 def controleEnPublish(control_linear_vel, target_linear_vel,control_angular_vel, target_angular_vel):
     twist = Twist()
@@ -181,12 +168,27 @@ def controleEnPublish(control_linear_vel, target_linear_vel,control_angular_vel,
     pub.publish(twist)
     return control_linear_vel, control_angular_vel ;
 
+
+def callback_fun(msg):
+	print(msg.function,msg.distance,msg.angle)
+	if msg.function == 'turn':
+		turn(msg.angle,0,0,0,0)
+	elif msg.function == 'straigth':
+		goStraigth(msg.distance,0,0,0,0)
+	elif msg.function == 'stop':
+		stop()
+	else:
+		stop()
+
 if __name__=="__main__":
     if os.name != 'nt':
         settings = termios.tcgetattr(sys.stdin)
 
+
     rospy.init_node('wheel_control')
     pub = rospy.Publisher('cmd_vel', Twist, queue_size=10)
+    rospy.Subscriber("path", path_message, callback_fun)
+
 
     turtlebot3_model = rospy.get_param("model", "burger")
 
