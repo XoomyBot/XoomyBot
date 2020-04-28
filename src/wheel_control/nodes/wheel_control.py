@@ -29,7 +29,7 @@
 
 import rospy
 from geometry_msgs.msg import Twist
-import path_message.msg
+from wheel_control.msg import path_message
 import sys, select, os
 import math
 import time
@@ -187,7 +187,7 @@ if __name__=="__main__":
 
     rospy.init_node('wheel_control')
     pub = rospy.Publisher('cmd_vel', Twist, queue_size=10)
-    rospy.Subscriber("path", path_message, callback_fun)
+    rospy.Subscriber('path', path_message, callback_fun)
 
 
     turtlebot3_model = rospy.get_param("model", "burger")

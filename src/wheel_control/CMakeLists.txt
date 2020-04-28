@@ -9,7 +9,9 @@ project(wheel_control)
 ################################################################################
 find_package(catkin REQUIRED COMPONENTS
   rospy
+  std_msgs
   geometry_msgs
+  message_generation
 )
 
 ################################################################################
@@ -18,36 +20,28 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_python_setup()
 
 ################################################################################
-# Declare ROS messages, services and actions
+# Add messages
 ################################################################################
+add_message_files(
+  FILES
+  path_message.msg
+)
 
-################################################################################
-# Declare ROS dynamic reconfigure parameters
-################################################################################
+add_service_files(
+  FILES
+  path_service.srv
+)
 
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
 ################################################################################
 # Declare catkin specific configuration to be passed to dependent projects
 ################################################################################
 catkin_package(
-  CATKIN_DEPENDS rospy geometry_msgs
+  CATKIN_DEPENDS rospy geometry_msgs std_msgs message_runtime
 )
 
-################################################################################
-# Build
-################################################################################
 
-################################################################################
-# Install
-################################################################################
-#catkin_install_python(PROGRAMS
-#  nodes/wheel_control
-#  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-#)
 
-#install(DIRECTORY launch
-#  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-#)
-
-################################################################################
-# Test
-################################################################################
