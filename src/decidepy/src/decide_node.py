@@ -9,11 +9,15 @@ import cv2
 
 
 def callback(data):
-	global fids
+	global fids,draw_ids,ids
 	fids=data.fiducials
+	if(len(fids)>0):
+		rospy.loginfo(rospy.get_caller_id() + "nr of id %d",len(fids))
 	for i in range (len(fids)):
 		fid=fids[i];
-		rospy.loginfo(rospy.get_caller_id() + "I saw %d", fid.fiducial_id);
+    		rospy.loginfo(rospy.get_caller_id() + "I saw %d", fid.fiducial_id)
+		ids.append(fid.fiducial_id)
+
 def img_callback(data):
     try:
       cv_image = bridge.imgmsg_to_cv2(data, "bgr8")
@@ -23,6 +27,22 @@ def img_callback(data):
 	fid=fids[i];
 	pts=np.array([[fid.x0,fid.y0],[fid.x1,fid.y1],[fid.x2,fid.y2],[fid.x3,fid.y3]])
 	cv_image=cv2.polylines(cv_image, np.int32([pts]),  1, (255,0,255))
+
+		
+    if (0 in ids):
+	pnt0=[fid.x2,fid.y2]
+	cv_image = cv2.circle(cv_image, pnt0, 1, (0,0,255), 20) 
+	if (1 in ids):
+		pnt1=[fid.x3,fid.y3]
+		cv_image = cv2.circle(cv_image, pnt1, 1, (0,0,255), 20) 
+		if (2 in ids):
+			pnt2=[fid.x1,fid.y1]
+			cv_image = cv2.circle(cv_image, pnt2, 1, (0,0,255), 20) 
+			if (3 in ids):
+					pnt3=[fid.x0,fid.y0]
+					pts=np.array([pnt0,pnt1,pnt2,pnt3])
+					cv_image = cv2.circle(cv_image, pnt3, 1, (0,0,255), 20) 
+					cv_image=cv2.polylines(cv_image, np.int32([pts]),  1, (0,0,255))
 	
     cv2.imshow("Image window", cv_image)
     cv2.waitKey(3)
@@ -33,8 +53,10 @@ def img_callback(data):
       print(e)
 
 def decide():
-	global fids
+	global fids,draw_ids,ids
+	ids=[]
 	fids=[]
+	draw_ids=[0,1,2,3]
 	rospy.init_node('decide2', anonymous=True)
     	rospy.Subscriber("/fiducial_vertices", FiducialArray, callback)
     	rospy.Subscriber("/camera", Image,img_callback)

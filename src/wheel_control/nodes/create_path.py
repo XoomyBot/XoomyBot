@@ -2,6 +2,7 @@
 
 import rospy
 from geometry_msgs.msg import Twist
+from fiducial_msgs.msg import *
 from wheel_control.msg import path_message
 import sys, select, os
 import math
@@ -20,12 +21,20 @@ space key, s : force stop
 
 CTRL-C to quit
 """
+def callback(data):
+	global fids,ids
+	fids=data.fiducials
+	for i in range (len(fids)):
+		fid=fids[i];
+    		rospy.loginfo(rospy.get_caller_id() + "I saw %d", fid.fiducial_id)
+		ids.append(fid.fiducial_id)
 if __name__=="__main__":
 	if os.name != 'nt':
 		settings = termios.tcgetattr(sys.stdin)
 
 	rospy.init_node('create_path')
 	pub = rospy.Publisher('path', path_message, queue_size=10)
+    	rospy.Subscriber("/fiducial_vertices", FiducialArray, callback)
 
 	try:
 		print(msg)
