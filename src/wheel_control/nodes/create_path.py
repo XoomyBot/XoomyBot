@@ -35,7 +35,18 @@ def callback(data):
 			last=fid.fiducial_id
 			if (fid.fiducial_id==4):
 				print("teken rechthoek")
-				drawRectangle(1,2,90)  
+				drawRectangle(1,2,90)
+			if (fid.fiducial_id==5):
+				print("teken driehoek")
+				drawTriangle(2,120)
+			if (fid.fiducial.id=6):
+				print("stop")
+				message = path_message()
+				message.function = "stop"
+				message.distance= 0.0
+				message.angle = 0.0
+				pub.publish(message)
+
 
 def getKey():
     if os.name == 'nt':
