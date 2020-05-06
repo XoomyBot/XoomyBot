@@ -137,7 +137,7 @@ def Moves():
     		shape.append(eerste)
     		cont.append(shape)
   	scaler = ((pnt0[0]**2 + pnt1[0]**2)**0.5)
-	scaler= scaler/5
+	scaler= scaler/2
   	x0 = 0 #oorsprong
  	y0 = 0
   	theta0 = 0 #rechts
