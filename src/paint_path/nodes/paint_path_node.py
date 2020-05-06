@@ -7,18 +7,9 @@ if os.name == 'nt':
   import msvcrt
 else:
   import tty, termios
-
-
-def show_gazebo_coor():
-
-	model_coordinates = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
-	model_name = 'turtlebot3_burger'
-	relative_entity_name = 'wheel_left_link'
-	resp_coordinates = model_coordinates(model_name, relative_entity_name)
-	print("Model: " + str(model_name))
-	print("X-coordinate : " + str(resp_coordinates.pose.position.x))
-	print("Y-coordinate: " + str(resp_coordinates.pose.position.y))
-	return
+import cv2
+from PIL import Image, ImageDraw, ImageFont
+import matplotlib.pyplot as plt 
 
 	
 def getKey():
@@ -33,7 +24,24 @@ def getKey():
 		key = ''
 
 	termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
-	return key	
+	return key
+
+def draw(x,y,color, image):
+	img = Image.open(image)
+	pos = tuple([x,y])
+	w,h=500,500 
+	#newsize = (w,h) 
+	k = int(w/2) 
+	##imgres = img.resize(newsize) 
+	#draw the point on the path.png file75
+	draw = ImageDraw.Draw(img)
+	i = 0
+	j = 0
+	for i in range(-3,i<3,1):
+		for j in range(-3,j<3,1):
+			draw.point([(k+pos[0]+i,k+pos[1]+j)],fill=color)
+	img.save(image)	
+		
 
 if __name__ == '__main__':
 	if os.name != 'nt':
@@ -41,18 +49,28 @@ if __name__ == '__main__':
 	rospy.init_node('paint_path_node')
 
 	try:
+		imagePath = "path.png"
+		backColor = 'white' 
+		w,h=500,500 
+		k = int(w/2) 
+		img = Image.new('RGB', (w, h), color = backColor) 
+		img.save(imagePath)
+
 		while(1):
 			key = getKey()
 			
 			model_coordinates = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
 			model_name = 'turtlebot3_burger'
-			relative_entity_name = 'base_footprint'
+			#leave relative empty for model itself
+			
+			resp_coordinates = model_coordinates(model_name, '')
 
-			resp_coordinates = model_coordinates(model_name, relative_entity_name)
+			#print(resp_coordinates)
+			print('Status.success = ', resp_coordinates.success)
 			print("Model: " + str(model_name))
 			print("X-coordinate : " + str(resp_coordinates.pose.position.x))
 			print("Y-coordinate: " + str(resp_coordinates.pose.position.y))
-		
+			draw(100*resp_coordinates.pose.position.x,100*resp_coordinates.pose.position.y, "red", imagePath)
 			
 			if (key == '\x03'):
 				break
