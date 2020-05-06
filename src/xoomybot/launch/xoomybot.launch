@@ -8,8 +8,6 @@
   </node>
   <node pkg="wheel_control" type="wheel_control_node.py" name="wheel_control_node"  output="screen">
   </node>
-  <node pkg="wheel_control" type="create_path.py" name="create_path"  output="screen">
-  </node>
-  <node pkg="decidepy" type="decide_node.py" name="decide_node"  output="screen">
+   <node pkg="decidepy" type="decide_node.py" name="decide_node"  output="screen">
   </node>
 </launch>

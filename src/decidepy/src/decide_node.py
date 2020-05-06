@@ -45,7 +45,7 @@ def callback(data):
 			elif (fid.fiducial_id==3):
 				print("teken driehoek")
 				drawTriangle(2,120)
-			elif (fid.fiducial_id==6):
+			elif (fid.fiducial_id==5):
 				print("stop")
 				images=0
 				message = path_message()
@@ -99,7 +99,7 @@ def img_callback(data):
 		print("draw custom")
 		print(move)
 		drawCustom(move)
-		   
+    cv2.imshow("image",cv_image)	   
     cv2.waitKey(3)
 
     try:
@@ -108,7 +108,8 @@ def img_callback(data):
       print(e)
 def Moves():
 	image=opened
-	empty = np.zeros(image.shape, image.dtype)
+	cn = np.zeros(image.shape, image.dtype)
+	p = np.zeros(image.shape, image.dtype)
 	hoek=()
 	vooruit=()
 	_,contours, _ = cv2.findContours(image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -117,9 +118,10 @@ def Moves():
 	cnt=sorted(contours, key=cv2.contourArea, reverse=True)
 	approx = cv2.approxPolyDP(cnt[1], 0.01*cv2.arcLength(cnt[1], True), True)
       	points.append(approx)
-      	cv2.drawContours(empty, [approx], -1, (255,255,255), 1) 
+      	cv2.drawContours(cn, [approx], -1, (255,255,255), 1) 
   	cont = []
-	cv2.imshow("contours",empty)
+	cv2.imshow("contours",cn)
+	cv2.imshow("points",p)
 	for u in points: 
 		shape = []
     		x = 0
@@ -134,8 +136,8 @@ def Moves():
       			x = 1
     		shape.append(eerste)
     		cont.append(shape)
-  	scaler = int((pnt0[0]**2 + pnt1[0]**2)**0.5)
-	scaler= scaler/2
+  	scaler = ((pnt0[0]**2 + pnt1[0]**2)**0.5)
+	scaler= scaler/5
   	x0 = 0 #oorsprong
  	y0 = 0
   	theta0 = 0 #rechts
@@ -143,8 +145,15 @@ def Moves():
   	count = 0
   	for a in cont:
     		for b in a:
+			if (count==0):
+				x0 = b[0]
+      				y0 = b[1]
+				p = cv2.circle(p, (x0,y0), 1, (255,255,255), 5)
+
       			x1 = b[0]
       			y1 = b[1]
+			p = cv2.circle(p, (x1,y1), 1, (255,255,255), 5)
+			cv2.imshow("points",p) 
       			Dy = y1-y0
       			Dx = x1-x0
       			theta = math.atan(Dy/Dx)*(360/(2*math.pi))#omvormen naar graden
@@ -161,7 +170,7 @@ def Moves():
           				theta = theta+180
 	      		distance = ((Dx**2 + Dy**2)**0.5)/scaler
 			hoek = ("turn", 0, dtheta)
-			vooruit =("straight", distance, 0)
+			vooruit =("straigth", distance, 0)
 			moves.append(hoek)
 			moves.append(vooruit)
 			x0 = x1
@@ -202,9 +211,11 @@ def publish_message(func,dist,ang):
        	message.function = func
 	message.distance = dist
 	message.angle = ang
+	print(func,dist,ang)
         pub.publish(message)
 def drawCustom(data):
     print("pulbiceren")
+    publish_message("stop",0,0)   
     for i in range(len(data)):
 	publish_message(data[i][0],data[i][1],data[i][2])
     	publish_message("stop",0,0)
@@ -248,7 +259,7 @@ if __name__=="__main__":
 	if os.name != 'nt':
 		settings = termios.tcgetattr(sys.stdin)
 
-	rospy.init_node('decide_path_node')
+	rospy.init_node('decide_node')
 	pub = rospy.Publisher('path', path_message, queue_size=10)
     	rospy.Subscriber("/fiducial_vertices", FiducialArray, callback, queue_size=100)
     	decide()
