@@ -33,13 +33,15 @@ def callback(data):
     		rospy.loginfo(rospy.get_caller_id() + "I saw %d las %d", fid.fiducial_id,last)
 		if (fid.fiducial_id!=last):
 			last=fid.fiducial_id
-			if (fid.fiducial_id==4):
-				print("teken rechthoek")
-				drawRectangle(1,2,90)
-			if (fid.fiducial_id==5):
+			if (fid.fiducial_id==3):
 				print("teken driehoek")
 				drawTriangle(2,120)
-			if (fid.fiducial.id=6):
+
+			elif (fid.fiducial_id==4):
+				print("teken rechthoek")
+				drawRectangle(1,2,90)
+			
+			elif (fid.fiducial.id==5):
 				print("stop")
 				message = path_message()
 				message.function = "stop"
