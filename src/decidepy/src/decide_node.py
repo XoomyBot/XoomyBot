@@ -156,7 +156,7 @@ def Moves():
 			cv2.imshow("points",p) 
       			Dy = y1-y0
       			Dx = x1-x0
-      			theta = math.atan(Dy/Dx)*(360/(2*math.pi))#omvormen naar graden
+      			theta = -math.atan(Dy/Dx)*(360/(2*math.pi))#omvormen naar graden
       			if count < 2:
         			dtheta = theta
       			else:
@@ -169,7 +169,15 @@ def Moves():
           				dtheta = dtheta+180 #graden!!
           				theta = theta+180
 	      		distance = ((Dx**2 + Dy**2)**0.5)/scaler
-			hoek = ("turn", 0, dtheta)
+			if abs(dtheta) > 180:
+      				if dtheta < 0:
+        				hoekverandering = dtheta + 360
+      				else:
+        				hoekverandering = dtheta - 360
+    			else:
+      				hoekverandering = dtheta
+ 
+			hoek = ("turn", 0, hoekverandering)
 			vooruit =("straigth", distance, 0)
 			moves.append(hoek)
 			moves.append(vooruit)
