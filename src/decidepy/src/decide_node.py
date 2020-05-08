@@ -145,18 +145,13 @@ def Moves():
   	count = 0
   	for a in cont:
     		for b in a:
-			if (count==0):
-				x0 = b[0]
-      				y0 = b[1]
-				p = cv2.circle(p, (x0,y0), 1, (255,255,255), 5)
-
-      			x1 = b[0]
+			x1 = b[0]
       			y1 = b[1]
 			p = cv2.circle(p, (x1,y1), 1, (255,255,255), 5)
 			cv2.imshow("points",p) 
       			Dy = y1-y0
       			Dx = x1-x0
-      			theta = math.atan(Dy/Dx)*(360/(2*math.pi))#omvormen naar graden
+      			theta = -math.atan(Dy/Dx)*(360/(2*math.pi))#omvormen naar graden
       			if count < 2:
         			dtheta = theta
       			else:
