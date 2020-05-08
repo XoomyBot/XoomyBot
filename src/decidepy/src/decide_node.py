@@ -164,7 +164,15 @@ def Moves():
           				dtheta = dtheta+180 #graden!!
           				theta = theta+180
 	      		distance = ((Dx**2 + Dy**2)**0.5)/scaler
-			hoek = ("turn", 0, dtheta)
+			if abs(dtheta) > 180:
+      				if dtheta < 0:
+        				hoekverandering = dtheta + 360
+      				else:
+        				hoekverandering = dtheta - 360
+    			else:
+      				hoekverandering = dtheta
+ 
+			hoek = ("turn", 0, hoekverandering)
 			vooruit =("straigth", distance, 0)
 			moves.append(hoek)
 			moves.append(vooruit)
